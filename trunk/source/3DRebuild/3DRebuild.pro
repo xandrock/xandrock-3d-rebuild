@@ -15,6 +15,17 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 #this file specific the library path, may not be same path in different host so don't add it to repo
+# sample file :
+#INCLUDEPATH += ../../../../SDK/opencv/build/include
+#contains(QMAKE_HOST.arch, x86_64){
+#	win32-msvc2010{
+#		OPENCV_LIB += ../../../../SDK/opencv/build/x64/vc10/lib/
+#	}
+#}else{
+#	win32-msvc2013{
+#		OPENCV_LIB += ../../../../SDK/opencv/build/x86/vc12/lib/
+#	}
+#}
 include(Dependence.pri)
 
 INCLUDEPATH += ../common/3dmath
@@ -31,7 +42,6 @@ HEADERS += \
     ../common/3dmath/Quaternion.h \
     ../common/3dmath/Vector.h \
     ../common/3dmath/Matrix.h
-
 
 contains(QMAKE_HOST.arch, x86_64){
     release{
