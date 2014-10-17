@@ -7,6 +7,7 @@
 #include "opencv2/opencv.hpp"
 #include <QMap>
 #include <QList>
+#include <QFile>
 
 struct PointCC
 {
@@ -107,12 +108,12 @@ int main(int argc, char *argv[])
 	IplImage *rBars[12] = {NULL};
 	IplImage *lRBars[12] = {NULL};
 	IplImage *rRBars[12] = {NULL};
-	IplImage *lCanny[12] = {NULL};
-	IplImage *lRCanny[12] = {NULL};
-	IplImage *rCanny[12] = {NULL};
-	IplImage *rRCanny[12] = {NULL};
-	IplImage *lAndCanny[12] = {NULL};
-	IplImage *rAndCanny[12] = {NULL};
+	//IplImage *lCanny[12] = {NULL};
+	//IplImage *lRCanny[12] = {NULL};
+	//IplImage *rCanny[12] = {NULL};
+	//IplImage *rRCanny[12] = {NULL};
+	//IplImage *lAndCanny[12] = {NULL};
+	//IplImage *rAndCanny[12] = {NULL};
 
 	//create a window
 	cvNamedWindow("ImageView", CV_WINDOW_AUTOSIZE);
@@ -133,12 +134,12 @@ int main(int argc, char *argv[])
 		rBars[12 - i] = cvLoadImage(QString("ImageR%1.bmp").arg(i).toLatin1(), CV_LOAD_IMAGE_GRAYSCALE);
 		lRBars[12 - i] = cvCreateImage(cvGetSize(lBars[12 - i]), IPL_DEPTH_8U, 1);
 		rRBars[12 - i] = cvCreateImage(cvGetSize(lBars[12 - i]), IPL_DEPTH_8U, 1);
-		lCanny[12 - i] = cvCreateImage(cvGetSize(lBars[12 - i]), IPL_DEPTH_8U, 1);
-		rCanny[12 - i] = cvCreateImage(cvGetSize(lBars[12 - i]), IPL_DEPTH_8U, 1);
-		lRCanny[12 - i] = cvCreateImage(cvGetSize(lBars[12 - i]), IPL_DEPTH_8U, 1);
-		rRCanny[12 - i] = cvCreateImage(cvGetSize(lBars[12 - i]), IPL_DEPTH_8U, 1);
-		lAndCanny[12 - i] = cvCreateImage(cvGetSize(lBars[12 - i]), IPL_DEPTH_8U, 1);;
-		rAndCanny[12 - i] = cvCreateImage(cvGetSize(lBars[12 - i]), IPL_DEPTH_8U, 1);;
+		//lCanny[12 - i] = cvCreateImage(cvGetSize(lBars[12 - i]), IPL_DEPTH_8U, 1);
+		//rCanny[12 - i] = cvCreateImage(cvGetSize(lBars[12 - i]), IPL_DEPTH_8U, 1);
+		//lRCanny[12 - i] = cvCreateImage(cvGetSize(lBars[12 - i]), IPL_DEPTH_8U, 1);
+		//rRCanny[12 - i] = cvCreateImage(cvGetSize(lBars[12 - i]), IPL_DEPTH_8U, 1);
+		//lAndCanny[12 - i] = cvCreateImage(cvGetSize(lBars[12 - i]), IPL_DEPTH_8U, 1);;
+		//rAndCanny[12 - i] = cvCreateImage(cvGetSize(lBars[12 - i]), IPL_DEPTH_8U, 1);;
 	}
 	//GAUSSIAN smooth all image
 	cvSmooth(rAll, rAll, CV_GAUSSIAN, 3, 0, 0);
@@ -172,7 +173,7 @@ int main(int argc, char *argv[])
 	QElapsedTimer etimer;
 	etimer.start();
 	unsigned int fac = 1280;
-	for(int idx = 0; idx < 8; idx++)
+	for(int idx = 0; idx < 1; idx++)
 	{
 		//CvScalar blackValue = cvScalarAll(0);
 		unsigned char barPixel;
@@ -208,115 +209,163 @@ int main(int argc, char *argv[])
 		fac /= 2;
 	}
 
-	for(int idx = 8; idx < 9; idx++)
+	//for(int idx = 1; idx < 2; idx++)
+	//{
+	//	//IplImage *lCalBin = cvCreateImage(cvGetSize(lAll), IPL_DEPTH_16U, 1);
+	//	//IplImage *rCalBin = cvCreateImage(cvGetSize(rAll), IPL_DEPTH_16U, 1);
+	//	//cvCopy(lBinMap, lCalBin);;
+	//	//cvCopy(rBinMap, rCalBin);;
+	//	unsigned char barPixel;
+	//	unsigned char rBarPixel;
+	//	unsigned char allPix;
+	//	//QMap< baridx, QMap<Y, QPair<QList<LeftX>, QList<RightX> > > >
+	//	QMap<quint32, QMap<quint32,  QPair<QList<quint32>, QList<quint32> > > > bars;
+	//	for(int i = 0; i < lSize.width * lSize.height; i++)
+	//	{
+	//		int y = i / lSize.width;
+	//		int x = i % lSize.width;
+	//		if(y < 3)
+	//		{
+	//			continue;
+	//		}
+	//		allPix = *(lAll->imageData + i);
+	//		if(allPix >0)
+	//		{
+	//			barPixel = *(lBars[idx]->imageData + i);
+	//			rBarPixel = *(lRBars[idx]->imageData + i);
+	//			unsigned short *pData = (unsigned short*)(lBinMap->imageData);
+	//			pData += i;
+	//			unsigned short val = *pData;
+	//			if(barPixel > rBarPixel)
+	//			{
+	//				val++;
+	//			}
+	//			if(barPixel != rBarPixel)
+
+	//			if(bars[val][y].first.count() < 2)
+	//			{
+	//				bars[val][y].first.append(x);
+	//			}else
+	//			{
+	//				bars[val][y].first[1] = x;
+	//			}
+	//			
+	//		}
+	//		allPix = *(rAll->imageData + i);
+	//		if(allPix > 0)
+	//		{
+	//			barPixel = *(rBars[idx]->imageData + i);
+	//			rBarPixel = *(rRBars[idx]->imageData + i);
+	//			unsigned short *pData = (unsigned short*)(rBinMap->imageData);
+	//			pData += i;
+	//			unsigned short val = *pData;
+	//			if(barPixel > rBarPixel)
+	//			{
+	//				val++;
+	//			}
+	//			if(barPixel != rBarPixel)
+	//			if(bars[val][y - 3].second.count() < 2)
+	//			{
+	//				bars[val][y - 3].second.append(x);
+	//			}else
+	//			{
+	//				bars[val][y - 3].second[1] = x;
+	//			}
+	//		}
+	//	}
+	//	foreach(quint32 bidx, bars.keys())
+	//	{
+	//
+	//		foreach(quint32 y, bars[bidx].keys())
+	//		{
+	//			QPair<QList<quint32>, QList<quint32> > pts = bars[bidx][y];
+	//			if(pts.first.isEmpty() || pts.second.isEmpty())
+	//			{
+	//				bars[bidx].remove(y);
+	//				continue;
+	//			}
+	//			// math the left edge of this bar
+	//			CVector lScreenPos(pts.first.first(), 959.0 - y, 1.0);
+	//			CVector rScreenPos(pts.second.first(), 962.0 - y, 1.0);
+	//			CVector lRealPos = Matrix::UnprojectPoint(lScreenPos, matLMv, matPrj, viewport);
+	//			CVector rRealPos = Matrix::UnprojectPoint(rScreenPos, matRMv, matPrj, viewport);
+	//			CVector b1, b2;
+	//			CVector::GetShortestBridge(leftCameraPos, lRealPos, rightCameraPos, rRealPos, b1, b2);
+	//			if((b1 - b2).Length() < 10.0)
+	//			{
+	//				CVector realPos = (b1 + b2) / 2.0;
+	//				PointCC pxc;
+	//				pxc.realDot = realPos;
+	//				pxc.leftDot = QPoint(pts.first.first(), y);
+	//				pxc.rightDot = QPoint(pts.first.first(), y - 3);
+	//				pxc.color[0] = cvGet2D(colorImg, y, pts.first.first()).val[2];
+	//				pxc.color[1] = cvGet2D(colorImg, y, pts.first.first()).val[1];
+	//				pxc.color[2] = cvGet2D(colorImg, y, pts.first.first()).val[0];
+	//				finalPoints.append(pxc);
+	//			}
+	//			////// then math the right edge
+	//			//if(pts.first.count() == 1 && pts.second.count() == 1)
+	//			//{
+	//			//	continue;
+	//			//}
+	//			//lScreenPos = CVector(pts.first.last(), 959.0 - y, 1.0);
+	//			//rScreenPos = CVector(pts.second.last(), 962.0 - y, 1.0);
+	//			//lRealPos = Matrix::UnprojectPoint(lScreenPos, matLMv, matPrj, viewport);
+	//			//rRealPos = Matrix::UnprojectPoint(rScreenPos, matRMv, matPrj, viewport);
+	//			//CVector::GetShortestBridge(leftCameraPos, lRealPos, rightCameraPos, rRealPos, b1, b2);
+	//			//if((b1 - b2).Length() < 10.0)
+	//			//{
+	//			//	CVector realPos = (b1 + b2) / 2.0;
+	//			//	PointCC pxc;
+	//			//	pxc.realDot = realPos;
+	//			//	pxc.leftDot = QPoint(pts.first.last(), y);
+	//			//	pxc.rightDot = QPoint(pts.first.last(), y - 3);
+
+	//			//	pxc.color[0] = cvGet2D(colorImg, y, pts.first.last()).val[2];
+	//			//	pxc.color[1] = cvGet2D(colorImg, y, pts.first.last()).val[1];
+	//			//	pxc.color[2] = cvGet2D(colorImg, y, pts.first.last()).val[0];
+	//			//	finalPoints.append(pxc);
+	//			//}
+	//		}
+	//	}
+
+
+	//	//
+	//	qDebug() << bars;
+	//	QFile qf("textOupt.txt");
+	//	qf.open(QIODevice::WriteOnly);
+	//	foreach(quint32 bidx, bars.keys())
+	//	{
+	//		qf.write(QString("Bar%1\n").arg(bidx).toLatin1());
+	//		foreach(quint32 y, bars[bidx].keys())
+	//		{
+	//			qf.write(QString("    In Left Row%1 And Right Row%2\n").arg(y).arg(y - 3).toLatin1());
+	//			qf.write(QString("        Left %1 - %2  Right %3 - %4 \n")
+	//				.arg(bars[bidx][y].first.first())
+	//				.arg(bars[bidx][y].first.last())
+	//				.arg(bars[bidx][y].second.first())
+	//				.arg(bars[bidx][y].second.last()).toLatin1());
+	//		}
+	//	}
+	//	qf.close();
+	//	//cvReleaseImage(&lCalBin);
+	//	//cvReleaseImage(&rCalBin);
+	//}
+	QFile qf("textOupt.txt");
+	qf.open(QIODevice::WriteOnly);
+	for(int j = 0; j < lSize.height; j++)
 	{
-		//IplImage *lCalBin = cvCreateImage(cvGetSize(lAll), IPL_DEPTH_16U, 1);
-		//IplImage *rCalBin = cvCreateImage(cvGetSize(rAll), IPL_DEPTH_16U, 1);
-		//cvCopy(lBinMap, lCalBin);;
-		//cvCopy(rBinMap, rCalBin);;
-		unsigned char barPixel;
-		unsigned char rBarPixel;
-		unsigned char allPix;
-		//QMap< baridx, QMap<Y, QPair<QList<LeftX>, QList<RightX> > > >
-		QMap<quint32, QMap<quint32,  QPair<QList<quint32>, QList<quint32> > > > bars;
-		for(int i = 0; i < lSize.width * lSize.height; i++)
+		unsigned short preVal = 0;
+		unsigned short thisVal = 0;
+		for(int i = 0; i < lSize.width; i++)
 		{
-			int y = i / lSize.width;
-			int x = i % lSize.width;
-			if(y < 3)
-			{
-				continue;
-			}
-			allPix = *(lAll->imageData + i);
-			if(allPix >0)
-			{
-				barPixel = *(lBars[idx]->imageData + i);
-				rBarPixel = *(lRBars[idx]->imageData + i);
-				unsigned short *pData = (unsigned short*)(lBinMap->imageData);
-				pData += i;
-				unsigned short val = *pData;
-				if(barPixel > rBarPixel)
-				{
-					val++;
-				}
-				bars[val][y].first.append(x);
-			}
-			allPix = *(rAll->imageData + i);
-			if(allPix > 0)
-			{
-				barPixel = *(rBars[idx]->imageData + i);
-				rBarPixel = *(rRBars[idx]->imageData + i);
-				unsigned short *pData = (unsigned short*)(rBinMap->imageData);
-				pData += i;
-				unsigned short val = *pData;
-				if(barPixel > rBarPixel)
-				{
-					val++;
-				}
-				bars[val][y - 3].second.append(x);
-			}
+			unsigned short *pData = (unsigned short*)(rBinMap->imageData);
+			pData += i;
+			unsigned short val = *pData;
 		}
-		foreach(quint32 bidx, bars.keys())
-		{
-			foreach(quint32 y, bars[bidx].keys())
-			{
-				QPair<QList<quint32>, QList<quint32> > pts = bars[bidx][y];
-				if(pts.first.isEmpty() || pts.second.isEmpty())
-				{
-					continue;
-				}
-				// math the left edge of this bar
-				CVector lScreenPos(pts.first.first(), 959.0 - y, 1.0);
-				CVector rScreenPos(pts.second.first(), 962.0 - y, 1.0);
-				CVector lRealPos = Matrix::UnprojectPoint(lScreenPos, matLMv, matPrj, viewport);
-				CVector rRealPos = Matrix::UnprojectPoint(rScreenPos, matRMv, matPrj, viewport);
-				CVector b1, b2;
-				CVector::GetShortestBridge(leftCameraPos, lRealPos, rightCameraPos, rRealPos, b1, b2);
-				if((b1 - b2).Length() < 10.0)
-				{
-					CVector realPos = (b1 + b2) / 2.0;
-					PointCC pxc;
-					pxc.realDot = realPos;
-					pxc.leftDot = QPoint(pts.first.first(), y);
-					pxc.rightDot = QPoint(pts.first.first(), y - 3);
-					pxc.color[0] = cvGet2D(colorImg, y, pts.first.first()).val[2];
-					pxc.color[1] = cvGet2D(colorImg, y, pts.first.first()).val[1];
-					pxc.color[2] = cvGet2D(colorImg, y, pts.first.first()).val[0];
-					finalPoints.append(pxc);
-				}
-				// then math the right edge
-				if(pts.first.count() == 1 && pts.second.count() == 1)
-				{
-					continue;
-				}
-				lScreenPos = CVector(pts.first.last(), 959.0 - y, 1.0);
-				rScreenPos = CVector(pts.second.last(), 962.0 - y, 1.0);
-				lRealPos = Matrix::UnprojectPoint(lScreenPos, matLMv, matPrj, viewport);
-				rRealPos = Matrix::UnprojectPoint(rScreenPos, matRMv, matPrj, viewport);
-				CVector::GetShortestBridge(leftCameraPos, lRealPos, rightCameraPos, rRealPos, b1, b2);
-				if((b1 - b2).Length() < 10.0)
-				{
-					CVector realPos = (b1 + b2) / 2.0;
-					PointCC pxc;
-					pxc.realDot = realPos;
-					pxc.leftDot = QPoint(pts.first.last(), y);
-					pxc.rightDot = QPoint(pts.first.last(), y - 3);
-
-					pxc.color[0] = cvGet2D(colorImg, y, pts.first.last()).val[2];
-					pxc.color[1] = cvGet2D(colorImg, y, pts.first.last()).val[1];
-					pxc.color[2] = cvGet2D(colorImg, y, pts.first.last()).val[0];
-					finalPoints.append(pxc);
-				}
-			}
-		}
-
-
-		//
-
-
-		//cvReleaseImage(&lCalBin);
-		//cvReleaseImage(&rCalBin);
 	}
+
+	qf.close();
 
 	Save("x.ds3d");
 
@@ -390,12 +439,12 @@ int main(int argc, char *argv[])
 		cvReleaseImage(&rBars[i]);
 		cvReleaseImage(&lRBars[i]);
 		cvReleaseImage(&rRBars[i]);
-		cvReleaseImage(&lCanny[i]);
-		cvReleaseImage(&rCanny[i]);
-		cvReleaseImage(&lRCanny[i]);
-		cvReleaseImage(&rRCanny[i]);
-		cvReleaseImage(&lAndCanny[i]);
-		cvReleaseImage(&rAndCanny[i]);
+		//cvReleaseImage(&lCanny[i]);
+		//cvReleaseImage(&rCanny[i]);
+		//cvReleaseImage(&lRCanny[i]);
+		//cvReleaseImage(&rRCanny[i]);
+		//cvReleaseImage(&lAndCanny[i]);
+		//cvReleaseImage(&rAndCanny[i]);
 	}
 	cvReleaseImage(&lAll);
 	cvReleaseImage(&lDark);
