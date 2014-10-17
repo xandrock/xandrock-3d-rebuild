@@ -124,8 +124,8 @@ int main(int argc, char *argv[])
 	rDark = cvLoadImage("ImageR13.bmp", CV_LOAD_IMAGE_GRAYSCALE);
 	rAll = cvLoadImage("ImageR14.bmp", CV_LOAD_IMAGE_GRAYSCALE);
 	colorImg = cvLoadImage("ImageL14.bmp", CV_LOAD_IMAGE_COLOR);
-	lBinMap = cvCreateImage(cvGetSize(lAll), IPL_DEPTH_16U, 1);
-	rBinMap = cvCreateImage(cvGetSize(rAll), IPL_DEPTH_16U, 1);
+	lBinMap = cvCreateImage(cvGetSize(lAll), IPL_DEPTH_8U, 3);
+	rBinMap = cvCreateImage(cvGetSize(rAll), IPL_DEPTH_8U, 3);
 	cvSetZero(lBinMap);
 	cvSetZero(rBinMap);
 	for(int i = 12; i > 0; i--)
@@ -167,13 +167,39 @@ int main(int argc, char *argv[])
 		cvSub(rAll, rBars[i], rRBars[i]);
 	}
 
-	int threshold = 20;
 	CvSize lSize = cvGetSize(lAll);
 	CvSize rSize = cvGetSize(rAll);
+
+	uchar* const pLBinData = (uchar *)(lBinMap->imageData);
+	uchar* const pRBinData = (uchar *)(rBinMap->imageData);
+	
+	for(int i = 0; i < lSize.width * lSize.height; i++)
+	{
+		unsigned char allPix;
+		allPix = *(lAll->imageData + i);
+		if(allPix >0)
+		{
+			pLBinData[i * 3 + 1] = 64;
+		}
+		allPix = *(rAll->imageData + i);
+		if(allPix >0)
+		{
+			pRBinData[i * 3 + 1] = 64;
+		}
+
+	}
+
+
+
+	int binStep = lBinMap->widthStep / sizeof(uchar);  
+	int channels = lBinMap->nChannels;  
+	uchar *b,*g,*r;  
+
+	int threshold = 20;
 	QElapsedTimer etimer;
 	etimer.start();
-	unsigned int fac = 1280;
-	for(int idx = 0; idx < 1; idx++)
+	unsigned char fac = 128;
+	for(int idx = 0; idx < 8; idx++)
 	{
 		//CvScalar blackValue = cvScalarAll(0);
 		unsigned char barPixel;
@@ -188,9 +214,7 @@ int main(int argc, char *argv[])
 				rBarPixel = *(lRBars[idx]->imageData + i);
 				if(barPixel > rBarPixel)
 				{
-					unsigned short *pData = (unsigned short*)(lBinMap->imageData);
-					pData += i;
-					*(pData) += fac;
+					pLBinData[i * 3 + 0] += fac;
 				}
 			}
 			allPix = *(rAll->imageData + i);
@@ -200,14 +224,14 @@ int main(int argc, char *argv[])
 				rBarPixel = *(rRBars[idx]->imageData + i);
 				if(barPixel > rBarPixel)
 				{
-					unsigned short *pData = (unsigned short*)(rBinMap->imageData);
-					pData += i;
-					*(pData) += fac;
+					pRBinData[i * 3 + 0] += fac;
 				}
 			}
 		}
 		fac /= 2;
 	}
+
+
 
 	//for(int idx = 1; idx < 2; idx++)
 	//{
@@ -351,23 +375,10 @@ int main(int argc, char *argv[])
 	//	//cvReleaseImage(&lCalBin);
 	//	//cvReleaseImage(&rCalBin);
 	//}
-	QFile qf("textOupt.txt");
-	qf.open(QIODevice::WriteOnly);
-	for(int j = 0; j < lSize.height; j++)
-	{
-		unsigned short preVal = 0;
-		unsigned short thisVal = 0;
-		for(int i = 0; i < lSize.width; i++)
-		{
-			unsigned short *pData = (unsigned short*)(rBinMap->imageData);
-			pData += i;
-			unsigned short val = *pData;
-		}
-	}
 
-	qf.close();
+	//qf.close();
 
-	Save("x.ds3d");
+	//Save("x.ds3d");
 
 
 
@@ -452,5 +463,6 @@ int main(int argc, char *argv[])
 	cvReleaseImage(&rDark);
 	cvReleaseImage(&lBinMap);
 	cvReleaseImage(&rBinMap);
+	qDebug() << "Finished!!!!!!!!!!!";
 	return a.exec();
 }
