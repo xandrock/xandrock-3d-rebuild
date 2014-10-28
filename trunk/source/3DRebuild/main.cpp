@@ -319,6 +319,8 @@ int main(int argc, char *argv[])
 	IplImage *rBars[12] = {NULL};
 	IplImage *lRBars[12] = {NULL};
 	IplImage *rRBars[12] = {NULL};
+	CvMat *lMapping = NULL;
+	CvMat *rMapping = NULL;
 	//IplImage *lCanny[12] = {NULL};
 	//IplImage *lRCanny[12] = {NULL};
 	//IplImage *rCanny[12] = {NULL};
@@ -549,17 +551,102 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	foreach(quint32 key, leftBarMap.keys())
+	lMapping = cvCreateMat(lSize.height, lSize.width, CV_16UC2);
+	rMapping = cvCreateMat(lSize.height, lSize.width, CV_16UC2);
+	cvSetZero(lMapping);
+	cvSetZero(rMapping);
+
+	foreach(int key, leftBarMap.keys())
 	{
+		foreach(int y, leftBarMap[key].keys())
+		{
+			for(int idx = 0; idx < leftBarMap[key][y].count(); ++idx)
+			{
+				double minBDis = FLT_MAX;
+				double minEDis = FLT_MAX;
+				QPoint minBPoint(0, 0);
+				QPoint minEPoint(0, 0);
+				CVector lBScreenPos = CVector(leftBarMap[key][y][idx].first, 959.0 - y, 1.0);
+				CVector lBRealPos = Matrix::UnprojectPoint(lBScreenPos, matLMv, matPrj, viewport);
+				CVector lEScreenPos = CVector(leftBarMap[key][y][idx].second, 959.0 - y, 1.0);
+				CVector lERealPos = Matrix::UnprojectPoint(lEScreenPos, matLMv, matPrj, viewport);
+				CVector minBVector;
+				CVector minEVector;
+				for(int ry = y - 15; ry <= y + 15; ry++)
+				{
+					if(rightBarMap[key].contains(ry))
+					{
+						for(int ydx = 0; ydx < rightBarMap[key][ry].count(); ++ydx)
+						{
+							CVector rBScreenPos = CVector(rightBarMap[key][ry][ydx].first, 959.0 - ry, 1.0);
+							CVector rBRealPos = Matrix::UnprojectPoint(rBScreenPos, matRMv, matPrj, viewport);
+							CVector rEScreenPos = CVector(rightBarMap[key][ry][ydx].second, 959.0 - ry, 1.0);
+							CVector rERealPos = Matrix::UnprojectPoint(rEScreenPos, matRMv, matPrj, viewport);
+							CVector brigePosA;
+							CVector brigePosB;
+							CVector abLength;
+							CVector::GetShortestBridge(leftCameraPos, lBRealPos, rightCameraPos, rBRealPos, brigePosA, brigePosB);
+							abLength = brigePosA - brigePosB;
+							if(abLength.Length() < minBDis)
+							{
+								minBDis = abLength.Length();
+								minBPoint = QPoint(rightBarMap[key][ry][ydx].first, ry);
+								minBVector = (brigePosB + brigePosA) / 2.0;
+							}
+							CVector::GetShortestBridge(leftCameraPos, lERealPos, rightCameraPos, rERealPos, brigePosA, brigePosB);
+							abLength = brigePosA - brigePosB;
+							if(abLength.Length() < minEDis)
+							{
+								minEDis = abLength.Length();
+								minEPoint = QPoint(rightBarMap[key][ry][ydx].second, ry);
+								minEVector = (brigePosB + brigePosA) / 2.0;
+							}
+						}
+					}
+				}
+				if(minBDis < FLT_MAX && minBPoint != QPoint(0, 0))
+				{
+					short* plmData = lMapping->data.s + (y * lSize.width + leftBarMap[key][y][idx].first) * 2;
+					*plmData = minBPoint.x();
+					*(plmData + 1) = minBPoint.y();
+					PointCC pxc;
+					pxc.realDot = minBVector;
+					pxc.leftDot = QPoint(leftBarMap[key][y][idx].first, y);
+					pxc.rightDot = QPoint(minBPoint.x(), minBPoint.y());
+					unsigned char *pColorData = (uchar *)(colorImg->imageData);
+					pColorData += (y * lSize.width + leftBarMap[key][y][idx].first) * 3;
+					pxc.color[0] = *(pColorData + 2);
+					pxc.color[1] = *(pColorData + 1);
+					pxc.color[2] = *(pColorData + 0);
+					finalPoints.append(pxc);
+
+				}
+				if(minEDis < FLT_MAX && minEPoint != QPoint(0, 0))
+				{
+					short* plmData = lMapping->data.s + (y * lSize.width + leftBarMap[key][y][idx].second) * 2;
+					*plmData = minEPoint.x();
+					*(plmData + 1) = minEPoint.y();
+					PointCC pxc;
+					pxc.realDot = minEVector;
+					pxc.leftDot = QPoint(leftBarMap[key][y][idx].second, y);
+					pxc.rightDot = QPoint(minEPoint.x(), minEPoint.y());
+					unsigned char *pColorData = (uchar *)(colorImg->imageData);
+					pColorData += (y * lSize.width + leftBarMap[key][y][idx].second) * 3;
+					pxc.color[0] = *(pColorData + 2);
+					pxc.color[1] = *(pColorData + 1);
+					pxc.color[2] = *(pColorData + 0);
+					finalPoints.append(pxc);
+				}
+			}
+		}
 		//foreach(quint32 y, leftBarMap[key].keys())
 		//{
 		//	if(leftBarMap[key][y].length() > 1)
 		//	{
-		//		qDebug() << "Left More" << key << y;
+		//	d	qDebug() << "Left More" << key << y;
 		//	}
 		//}
 	}
-
 
 	//for(int y = 3; y < lSize.height; ++y)
 	//{
@@ -692,7 +779,7 @@ int main(int argc, char *argv[])
 
 	//}
 
-	//Save("x.ds3d");
+	Save("x.ds3d");
 
 
 
@@ -780,6 +867,8 @@ int main(int argc, char *argv[])
 	cvReleaseImage(&rDark);
 	cvReleaseImage(&lBinMap);
 	cvReleaseImage(&rBinMap);
+	cvReleaseMat(&lMapping);
+	cvReleaseMat(&rMapping);
 	qDebug() << "Finished!!!!!!!!!!!";
 	return a.exec();
 }
