@@ -609,175 +609,17 @@ int main(int argc, char *argv[])
 					short* plmData = lMapping->data.s + (y * lSize.width + leftBarMap[key][y][idx].first) * 2;
 					*plmData = minBPoint.x();
 					*(plmData + 1) = minBPoint.y();
-					PointCC pxc;
-					pxc.realDot = minBVector;
-					pxc.leftDot = QPoint(leftBarMap[key][y][idx].first, y);
-					pxc.rightDot = QPoint(minBPoint.x(), minBPoint.y());
-					unsigned char *pColorData = (uchar *)(colorImg->imageData);
-					pColorData += (y * lSize.width + leftBarMap[key][y][idx].first) * 3;
-					pxc.color[0] = *(pColorData + 2);
-					pxc.color[1] = *(pColorData + 1);
-					pxc.color[2] = *(pColorData + 0);
-					finalPoints.append(pxc);
-
 				}
 				if(minEDis < FLT_MAX && minEPoint != QPoint(0, 0))
 				{
 					short* plmData = lMapping->data.s + (y * lSize.width + leftBarMap[key][y][idx].second) * 2;
 					*plmData = minEPoint.x();
 					*(plmData + 1) = minEPoint.y();
-					PointCC pxc;
-					pxc.realDot = minEVector;
-					pxc.leftDot = QPoint(leftBarMap[key][y][idx].second, y);
-					pxc.rightDot = QPoint(minEPoint.x(), minEPoint.y());
-					unsigned char *pColorData = (uchar *)(colorImg->imageData);
-					pColorData += (y * lSize.width + leftBarMap[key][y][idx].second) * 3;
-					pxc.color[0] = *(pColorData + 2);
-					pxc.color[1] = *(pColorData + 1);
-					pxc.color[2] = *(pColorData + 0);
-					finalPoints.append(pxc);
 				}
 			}
 		}
-		//foreach(quint32 y, leftBarMap[key].keys())
-		//{
-		//	if(leftBarMap[key][y].length() > 1)
-		//	{
-		//	d	qDebug() << "Left More" << key << y;
-		//	}
-		//}
 	}
 
-	//for(int y = 3; y < lSize.height; ++y)
-	//{
-
-	//}
-	////QMap< baridx, QMap<Y, QPair<QList<LeftX>, QList<RightX> > > >
-	//QMap<quint32, QMap<quint32,  QPair<QList<quint32>, QList<quint32> > > > bars;
-	//for(int i = 0; i < lSize.width * lSize.height; i++)
-	//{
-	//	int y = i / lSize.width;
-	//	int x = i % lSize.width;
-	//	if(y < 3/* || x < 250 || x > 880*/)
-	//	{
-	//		continue;
-	//	}
-	//	uchar r = pLCalData[i * 3 + 2 ];
-	//	uchar g = pLCalData[i * 3 + 1 ];
-	//	uchar b = pLCalData[i * 3 + 0 ];
-
-	//	quint32 val = r << 16 | b << 8 | g;
-
-	//	if(bars[val][y].first.count() < 2)
-	//	{
-	//		bars[val][y].first.append(x);
-	//	}else
-	//	{
-	//		bars[val][y].first[1] = x;
-	//	}
-	//	r = pRCalData[i * 3 + 2 ];
-	//	g = pRCalData[i * 3 + 1 ];
-	//	b = pRCalData[i * 3 + 0 ];
-
-	//	val = r << 16 | b << 8 | g;
-
-	//	if(bars[val][y - 3].second.count() < 2)
-	//	{
-	//		bars[val][y - 3].second.append(x);
-	//	}else
-	//	{
-	//		bars[val][y - 3].second[1] = x;
-	//	}
-	//}
-	////foreach(quint32 bidx, bars.keys())
-	////{
-	////
-	////	foreach(quint32 y, bars[bidx].keys())
-	////	{
-	////		QPair<QList<quint32>, QList<quint32> > pts = bars[bidx][y];
-	////		if(pts.first.isEmpty() || pts.second.isEmpty())
-	////		{
-	////			bars[bidx].remove(y);
-	////			continue;
-	////		}
-	////		// math the left edge of this bar
-	////		CVector lScreenPos(pts.first.first(), 959.0 - y, 1.0);
-	////		CVector rScreenPos(pts.second.first(), 962.0 - y, 1.0);
-	////		CVector lRealPos = Matrix::UnprojectPoint(lScreenPos, matLMv, matPrj, viewport);
-	////		CVector rRealPos = Matrix::UnprojectPoint(rScreenPos, matRMv, matPrj, viewport);
-	////		CVector b1, b2;
-	////		CVector::GetShortestBridge(leftCameraPos, lRealPos, rightCameraPos, rRealPos, b1, b2);
-	////		if((b1 - b2).Length() < 10.0)
-	////		{
-	////			CVector realPos = (b1 + b2) / 2.0;
-	////			PointCC pxc;
-	////			pxc.realDot = realPos;
-	////			pxc.leftDot = QPoint(pts.first.first(), y);
-	////			pxc.rightDot = QPoint(pts.first.first(), y - 3);
-	////			pxc.color[0] = cvGet2D(colorImg, y, pts.first.first()).val[2];
-	////			pxc.color[1] = cvGet2D(colorImg, y, pts.first.first()).val[1];
-	////			pxc.color[2] = cvGet2D(colorImg, y, pts.first.first()).val[0];
-	////			finalPoints.append(pxc);
-	////		}
-	////		////// then math the right edge
-	////		//if(pts.first.count() == 1 && pts.second.count() == 1)
-	////		//{
-	////		//	continue;
-	////		//}
-	////		//lScreenPos = CVector(pts.first.last(), 959.0 - y, 1.0);
-	////		//rScreenPos = CVector(pts.second.last(), 962.0 - y, 1.0);
-	////		//lRealPos = Matrix::UnprojectPoint(lScreenPos, matLMv, matPrj, viewport);
-	////		//rRealPos = Matrix::UnprojectPoint(rScreenPos, matRMv, matPrj, viewport);
-	////		//CVector::GetShortestBridge(leftCameraPos, lRealPos, rightCameraPos, rRealPos, b1, b2);
-	////		//if((b1 - b2).Length() < 10.0)
-	////		//{
-	////		//	CVector realPos = (b1 + b2) / 2.0;
-	////		//	PointCC pxc;
-	////		//	pxc.realDot = realPos;
-	////		//	pxc.leftDot = QPoint(pts.first.last(), y);
-	////		//	pxc.rightDot = QPoint(pts.first.last(), y - 3);
-
-	////		//	pxc.color[0] = cvGet2D(colorImg, y, pts.first.last()).val[2];
-	////		//	pxc.color[1] = cvGet2D(colorImg, y, pts.first.last()).val[1];
-	////		//	pxc.color[2] = cvGet2D(colorImg, y, pts.first.last()).val[0];
-	////		//	finalPoints.append(pxc);
-	////		//}
-	////	}
-	////}
-	////	//
-	//qDebug() << bars;
-	//QFile qf("textOupt.txt");
-	//qf.open(QIODevice::WriteOnly);
-	//foreach(quint32 bidx, bars.keys())
-	//{
-	//	if(bidx == 0)
-	//	{
-	//		continue;
-	//	}
-	//	qf.write(QString("Bar%1\n").arg(bidx).toLatin1());
-	//	foreach(quint32 y, bars[bidx].keys())
-	//	{
-	//		if(bars[bidx][y].first.isEmpty() || bars[bidx][y].second.isEmpty())
-	//		{
-	//			continue;
-	//		}
-	//		qf.write(QString("    In Left Row%1 And Right Row%2\n").arg(y).arg(y - 3).toLatin1());
-	//		qf.write(QString("        Left %1 - %2  Right %3 - %4 \n")
-	//			.arg(bars[bidx][y].first.first())
-	//			.arg(bars[bidx][y].first.last())
-	//			.arg(bars[bidx][y].second.first())
-	//			.arg(bars[bidx][y].second.last()).toLatin1());
-	//	}
-	//}
-	//qf.close();
-
-	//cvReleaseImage(&lCalBin);
-	//cvReleaseImage(&rCalBin);
-
-
-
-
-	//}
 
 	Save("x.ds3d");
 
@@ -835,19 +677,6 @@ int main(int argc, char *argv[])
 	//qDebug() << etimer.elapsed();
 	//cvSmooth(lBinMap, lBinMap, CV_GAUSSIAN, 10, 0, 0);
 	cvShowImage("ImageView", lBinMap);
-
-
-	//for(int i = 0; i < 1280; i++)
-	//{
-	//	uchar r = pLBinData[(1280 * 520 + i) * 3 + 2 ];
-	//	uchar g = pLBinData[(1280 * 520 + i) * 3 + 1 ];
-	//	uchar b = pLBinData[(1280 * 520 + i) * 3 + 0 ];
-
-	//	quint32 xxx = r << 16 | b << 8 | g;
-	//	qDebug() << i << QByteArray::number(xxx, 16);
-	//}
-
-
 	for(int i = 0; i < 12; i++)
 	{
 		cvReleaseImage(&lBars[i]);
